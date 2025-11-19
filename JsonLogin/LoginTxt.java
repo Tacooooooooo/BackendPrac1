@@ -20,7 +20,7 @@ public class LoginTxt {
             System.out.println("3. Exit");
             System.out.print("Choose an option: ");
             int choice = sc.nextInt();
-            sc.nextLine(); // consume newline
+            sc.nextLine();
 
             if (choice == 1) {
                 System.out.print("Enter new ID: ");
@@ -61,13 +61,13 @@ public class LoginTxt {
         try (BufferedReader br = new BufferedReader(new FileReader(FILE_NAME))) {
             String line;
             while ((line = br.readLine()) != null) {
-                String[] parts = line.split(":"); // format: ID:Password
+                String[] parts = line.split(":");
                 if (parts.length == 2) {
                     accounts.put(parts[0], parts[1]);
                 }
             }
         } catch (FileNotFoundException e) {
-            // File not found? No worries, just start empty
+
         } catch (IOException e) {
             System.out.println("Error reading accounts file.");
         }
