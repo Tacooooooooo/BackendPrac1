@@ -1,0 +1,99 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Scanner;
+import org.json.JSONObject;
+
+public class LoginTxt {
+    private static final String FILE_NAME = "accounts.json";
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        Map<String, String> accounts = loadAccounts();
+
+        while (true) {
+            System.out.println("\n=== Menu ===");
+            System.out.println("Sign Up");
+            System.out.println("Log In");
+            System.out.println("Exit");
+            System.out.print("Choose an option: ");
+            String choice = sc.nextLine();
+
+            if (choice.equalsIgnoreCase("sign up")) {
+                System.out.print("Enter new ID: ");
+                String newId = sc.nextLine();
+                if (accounts.containsKey(newId)) {
+                    System.out.println("ID already exists! Try another.");
+                    continue;
+                }
+                System.out.print("Enter new Password: ");
+                String newPassword = sc.nextLine();
+                accounts.put(newId, newPassword);
+                saveAccounts(accounts);
+                System.out.println("Sign up successful!");
+
+            } else if (choice.equalsIgnoreCase("log in")) {
+                System.out.print("Enter ID: ");
+                String loginId = sc.nextLine();
+                System.out.print("Enter Password: ");
+                String loginPassword = sc.nextLine();
+
+                if (accounts.containsKey(loginId) && accounts.get(loginId).equals(loginPassword)) {
+                    System.out.println("Logged in successfully!");
+                } else {
+                    System.out.println("Incorrect ID or Password.");
+                }
+
+            } else if (choice.equalsIgnoreCase("exit")) {
+                System.out.println("Exiting...");
+                break;
+
+            } else {
+                System.out.println("Invalid option! Try again.");
+            }
+        }
+
+        sc.close();
+    }
+
+    private static Map<String, String> loadAccounts() {
+        Map<String, String> accounts = new HashMap<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE_NAME))) {
+            StringBuilder sb = new StringBuilder();
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+
+            if (sb.length() > 0) {
+                JSONObject json = new JSONObject(sb.toString());
+                Iterator<String> keys = json.keys();
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    accounts.put(key, json.getString(key));
+                }
+            }
+        } catch (IOException e) {
+            // File not found is okay; first-time run
+        }
+
+        return accounts;
+    }
+
+    private static void saveAccounts(Map<String, String> accounts) {
+        JSONObject json = new JSONObject(accounts);
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_NAME))) {
+            bw.write(json.toString(4)); // pretty print with indent 4
+        } catch (IOException e) {
+            System.out.println("Error saving accounts file.");
+        }
+    }
+}
